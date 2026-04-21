@@ -105,7 +105,7 @@ function handleLogin(event) {
 function logout() {
     localStorage.removeItem('currentUser');
     alert("로그아웃 되었습니다.");
-    window.location.replace("index.html");
+    window.location.replace("main.html");
 }
 
 // ==========================================
