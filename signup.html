@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="glass-panel">
+        <h1>회원가입</h1>
+        <p class="subtitle">가입하고 씨네양과 함께하세요!</p>
+        
+        <form onsubmit="handleSignup(event)">
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" name="name" placeholder="홍길동" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">이메일 주소</label>
+                <input type="email" id="email" name="email" placeholder="name@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordConfirm">비밀번호 확인</label>
+                <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="비밀번호를 다시 입력하세요" required>
+            </div>
+            
+            <button type="submit" class="btn-primary">가입하기</button>
+        </form>
+
+        <div class="footer-link">
+            이미 계정이 있으신가요? <span onclick="navigateTo('login.html')" style="color: var(--primary-color); cursor: pointer; text-decoration: underline;">로그인</span>
+        </div>
+    </div>
+</body>
+</html>

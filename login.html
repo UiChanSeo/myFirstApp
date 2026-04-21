@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="glass-panel">
+        <h1>환영합니다</h1>
+        <p class="subtitle">계속하시려면 로그인해주세요.</p>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="email">이메일 주소</label>
+                <input type="email" id="email" name="email" placeholder="name@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="btn-primary">로그인</button>
+        </form>
+
+        <div class="footer-link">
+            계정이 없으신가요? <span onclick="navigateTo('signup.html')" style="color: var(--primary-color); cursor: pointer; text-decoration: underline;">회원가입</span>
+        </div>
+    </div>
+</body>
+</html>

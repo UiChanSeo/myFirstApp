@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYFLIX - New & Popular</title>
+    <link rel="stylesheet" href="netflix.css">
+    <script src="script.js" defer></script>
+    <style>
+        .hero {
+            background-image: linear-gradient(rgba(0,0,0,0.2), rgba(17,17,17,1)), url('https://image.tmdb.org/t/p/original/bQTIGkX2b0jT2QosIfIt0nS73jK.jpg'); /* Dune 2 Example */
+        }
+        .nav-links li:nth-child(4) { font-weight: bold; color: white; }
+    </style>
+</head>
+<body>
+    <nav class="netflix-nav">
+        <div class="nav-left">
+            <h1 class="logo">MYFLIX</h1>
+            <ul class="nav-links">
+                <li onclick="navigateTo('main.html')">Home</li>
+                <li onclick="navigateTo('series.html')">Series</li>
+                <li onclick="navigateTo('movies.html')">Movies</li>
+                <li onclick="navigateTo('new.html')">New & Popular</li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <button onclick="navigateTo('index.html')" class="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h2 class="hero-title">Dune: Part Two</h2>
+            <p class="hero-description">Paul Atreides unites with Chani and the Fremen while on a warpath of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, he endeavors to prevent a terrible future only he can foresee.</p>
+            <div class="hero-buttons">
+                <button class="play-btn"><span>▶</span> Play</button>
+                <button class="info-btn"><span>ⓘ</span> More Info</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="slider-container">
+        <h3 class="slider-title">New Releases</h3>
+        <div class="row-posters">
+            <img src="https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2JGjjcPEe.jpg" alt="Poster 1" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/xOmQQhlRqymxEE6Xh1M30aRkCPE.jpg" alt="Poster 2" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/fdZpvZCGvVK4vBHmS0Y1Xn0B4E0.jpg" alt="Poster 3" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/jdpcnZ10BInBfHlXnJ8jXo1x62O.jpg" alt="Poster 4" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/9B01GtwB4Q92n491TkiGhtcT3qA.jpg" alt="Poster 5" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/7oE3LnjdD5X26jH72dC0v7M0kGv.jpg" alt="Poster 6" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/2LqjX70eHkKWeR7t0D1z4tP9N4P.jpg" alt="Poster 7" class="row-poster">
+        </div>
+    </main>
+</body>
+</html>

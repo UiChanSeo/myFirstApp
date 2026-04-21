@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYFLIX - Series</title>
+    <link rel="stylesheet" href="netflix.css">
+    <script src="script.js" defer></script>
+    <style>
+        .hero {
+            background-image: linear-gradient(rgba(0,0,0,0.2), rgba(17,17,17,1)), url('https://image.tmdb.org/t/p/original/ggFHVNu6YYI5L9pCfOacjizwpB2.jpg'); /* Breaking Bad */
+        }
+        .nav-links li:nth-child(2) { font-weight: bold; color: white; }
+    </style>
+</head>
+<body>
+    <nav class="netflix-nav">
+        <div class="nav-left">
+            <h1 class="logo">MYFLIX</h1>
+            <ul class="nav-links">
+                <li onclick="navigateTo('main.html')">Home</li>
+                <li onclick="navigateTo('series.html')">Series</li>
+                <li onclick="navigateTo('movies.html')">Movies</li>
+                <li onclick="navigateTo('new.html')">New & Popular</li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <button onclick="navigateTo('index.html')" class="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h2 class="hero-title">Breaking Bad</h2>
+            <p class="hero-description">A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine in order to secure his family's future.</p>
+            <div class="hero-buttons">
+                <button class="play-btn"><span>▶</span> Play</button>
+                <button class="info-btn"><span>ⓘ</span> More Info</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="slider-container">
+        <h3 class="slider-title">Top Rated Series</h3>
+        <div class="row-posters">
+            <img src="https://image.tmdb.org/t/p/w500/vUUqzWa2LcUAYtclUguv2LZAiFO.jpg" alt="Poster 1" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg" alt="Poster 2" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/tsRy63MuMV5iNikaXk8uQlc9Xm.jpg" alt="Poster 3" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uA.jpg" alt="Poster 4" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/iqkWXbB2pS2jG5eebfVzXz2W88Y.jpg" alt="Poster 5" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/2q0s6j1iB4XElrT1o5U7mG90I4Z.jpg" alt="Poster 6" class="row-poster">
+            <img src="https://image.tmdb.org/t/p/w500/wAZuXQzQW2r6nStzZXYs1N5QkXY.jpg" alt="Poster 7" class="row-poster">
+        </div>
+    </main>
+</body>
+</html>

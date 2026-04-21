@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYFLIX - 커뮤니티</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="script.js" defer></script>
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333333;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --header-border: #eeeeee;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+            --hover-bg: #f1f1f1;
+            --accent-color: #e50914;
+            --modal-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-hover: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #141414;
+            --text-color: #ffffff;
+            --header-bg: rgba(20, 20, 20, 0.85);
+            --header-border: #333333;
+            --card-bg: #222222;
+            --border-color: #333333;
+            --hover-bg: #2a2a2a;
+            --modal-bg: #222222;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-hover: 0 12px 20px rgba(0,0,0,0.4);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Top Navigation */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #e50914; 
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            margin-left: 3rem;
+            flex: 1;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        #theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #theme-toggle:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* HOT 게시물 영역 */
+        .hot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .hot-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hot-card::before {
+            content: "HOT";
+            position: absolute;
+            top: 0; right: 0;
+            background: var(--accent-color);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-bottom-left-radius: 12px;
+        }
+
+        .hot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent-color);
+        }
+
+        .hot-title {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .hot-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 1rem;
+        }
+
+        /* 게시물 카드 스타일 */
+        #community-board-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .post-card {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            height: 160px;
+        }
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        .post-thumb {
+            width: 220px;
+            height: 160px;
+            object-fit: cover;
+            border-right: 1px solid var(--border-color);
+            background-color: #eee;
+        }
+        .post-content-container {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            flex: 1;
+        }
+        .post-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .post-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+        .comment-badge {
+            color: #e50914;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+            border: 1px solid rgba(229, 9, 20, 0.2);
+            background: rgba(229, 9, 20, 0.05);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+        .post-meta {
+            font-size: 0.85rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+        .meta-avatar {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ccc;
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 12px;
+            text-align: center;
+            line-height: 18px;
+        }
+        .post-excerpt {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .post-excerpt {
+            color: #aaa;
+        }
+
+        /* 하단 우측 글쓰기 버튼 */
+        .write-btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-write {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-write:hover {
+            background-color: #c40812;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(229, 9, 20, 0.4);
+        }
+
+        /* 햄버거 메뉴 및 사이드 메뉴 */
+        .icon-btn {
+            background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color);
+        }
+        .side-menu {
+            position: fixed; top: 0; right: -300px; width: 250px; height: 100vh; background-color: var(--card-bg);
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1); transition: right 0.3s ease; padding: 2rem; z-index: 1000; overflow-y:auto;
+        }
+        .side-menu.open { right: 0; }
+        .side-menu button {
+            background: none; border: none; color: var(--text-color); font-size: 1.1rem;
+            cursor: pointer; margin-bottom: 1rem; text-align: left; padding: 0; width: 100%; font-weight: bold;
+        }
+        #close-menu { font-size: 2rem; text-align: right; margin-bottom: 2rem; }
+        
+        /* 커뮤니티 서브 탭 스타일 */
+        .subnav-item {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 0.95rem;
+        }
+        .subnav-item:hover, .subnav-item.active {
+            background-color: var(--hover-bg);
+            color: var(--accent-color) !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; width: 100%;">
+            <a href="#" class="logo" onclick="MapsTo('main.html')">
+                🎬 MYFLIX
+            </a>
+            
+            <nav class="nav-links" style="display:flex; gap:2rem; margin-left:3rem; flex:1;">
+                <span class="nav-link" onclick="MapsTo('main.html')" style="cursor:pointer; font-weight:600; color:var(--text-color);">홈</span>
+                <span class="nav-link active" onclick="MapsTo('community.html')" style="cursor:pointer; font-weight:600; color:var(--accent-color);">커뮤니티</span>
+            </nav>
+            
+            <div class="header-right">
+                <span id="community-greeting" style="font-weight:bold; font-size:1rem; color:#e50914;"></span>
+                <button id="theme-toggle" style="margin-right:0.5rem; border:1px solid var(--border-color); padding:0.4rem 1rem; border-radius:20px; background:none; color:var(--text-color); font-weight:bold; cursor:pointer;">다크 모드</button>
+                <button id="hamburger-menu" class="icon-btn">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <div id="side-menu" class="side-menu" style="overflow-y:auto;">
+        <button id="close-menu">×</button>
+        <h3 style="margin-top: 0; color: var(--accent-color);">커뮤니티 메뉴</h3>
+        <div style="display:flex; flex-direction:column; gap:0.8rem; border-left: 2px solid var(--border-color); padding-left: 1rem; font-size:0.95rem; font-weight:bold;">
+            <a href="community.html" style="color:var(--text-color); text-decoration:none;">전체보기</a>
+            <a href="community.html?category=이글이글 🔥" style="color:#e50914; text-decoration:none;">이글이글 🔥</a>
+            <a href="community.html?category=커뮤니티" style="color:var(--text-color); text-decoration:none;">커뮤니티</a>
+            <a href="community.html?category=영화" style="color:var(--text-color); text-decoration:none;">영화</a>
+            <a href="community.html?category=OTT/콘텐츠" style="color:var(--text-color); text-decoration:none;">OTT/콘텐츠</a>
+            <a href="community.html?category=굿즈" style="color:var(--text-color); text-decoration:none;">굿즈</a>
+            <a href="community.html?category=자유/잡담" style="color:var(--text-color); text-decoration:none;">자유/잡담</a>
+            <a href="community.html?category=나눔/이벤트/정보" style="color:var(--text-color); text-decoration:none;">나눔/이벤트/정보</a>
+            <a href="community.html?category=극장근처" style="color:var(--text-color); text-decoration:none;">극장근처</a>
+            <a href="community.html?category=달력" style="color:var(--text-color); text-decoration:none;">달력</a>
+            <a href="community.html?category=이벤트" style="color:var(--text-color); text-decoration:none;">이벤트</a>
+            <a href="community.html?category=교환/거래" style="color:var(--text-color); text-decoration:none;">교환/거래</a>
+            <a href="community.html?category=문의/건의" style="color:var(--text-color); text-decoration:none;">문의/건의</a>
+            <a href="community.html?category=공지" style="color:var(--text-color); text-decoration:none;">공지</a>
+        </div>
+        <h3 style="margin-top:1.5rem; margin-bottom:0.5rem; color: var(--accent-color);">설정</h3>
+        <button onclick="logout()" onmouseover="this.style.backgroundColor='#e50914'; this.style.color='white'; this.style.borderColor='#e50914'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='inherit'; this.style.borderColor='currentColor'" style="background-color: transparent; color: inherit; border: 2px solid currentColor; padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 0; width: 100%; text-align: center;">로그아웃</button>
+    </div>
+
+    <main>
+        <!-- 사이트 계층 표시 (Breadcrumb) -->
+        <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1.5rem; display:flex; align-items:center; color:var(--text-color);">
+            <span style="color:#888; margin-right:8px;">📋 커뮤니티</span> 
+            <span style="color:#888; font-size:1rem; margin-right:8px;">></span> 
+            <span id="board-breadcrumb" style="color:var(--accent-color);">전체</span>
+        </div>
+
+        <!-- 서브 카테고리 (흰 바탕 라운드 탭 형태) -->
+        <nav class="community-subnav" style="display:flex; overflow-x:auto; background:var(--card-bg); border-radius:8px; border:1px solid var(--border-color); padding: 0.5rem; margin-bottom: 1rem; gap: 0.2rem; font-weight:600; white-space:nowrap; box-shadow: var(--shadow);">
+            <a href="community.html" class="subnav-item" id="nav-전체">전체</a>
+            <a href="community.html?category=이글이글 🔥" class="subnav-item" id="nav-이글이글" style="color:#e50914;">이글이글 🔥</a>
+            <a href="community.html?category=커뮤니티" class="subnav-item" id="nav-커뮤니티">커뮤니티</a>
+            <a href="community.html?category=영화" class="subnav-item" id="nav-영화">영화</a>
+            <a href="community.html?category=OTT/콘텐츠" class="subnav-item" id="nav-OTT콘텐츠">OTT/콘텐츠</a>
+            <a href="community.html?category=굿즈" class="subnav-item" id="nav-굿즈">굿즈</a>
+            <a href="community.html?category=자유/잡담" class="subnav-item" id="nav-자유잡담">자유/잡담</a>
+            <a href="community.html?category=나눔/이벤트/정보" class="subnav-item" id="nav-나눔이벤트정보">나눔/이벤트/정보</a>
+            <a href="community.html?category=극장근처" class="subnav-item" id="nav-극장근처">극장근처</a>
+            <a href="community.html?category=달력" class="subnav-item" id="nav-달력">달력</a>
+            <a href="community.html?category=이벤트" class="subnav-item" id="nav-이벤트">이벤트</a>
+            <a href="community.html?category=교환/거래" class="subnav-item" id="nav-교환거래">교환/거래</a>
+            <a href="community.html?category=문의/건의" class="subnav-item" id="nav-문의건의">문의/건의</a>
+            <a href="community.html?category=공지" class="subnav-item" id="nav-공지">공지</a>
+        </nav>
+
+
+        <!-- 영화 카테고리 전용 장르 서브메뉴 -->
+        <nav id="genre-subnav" style="display:none; overflow-x:auto; gap:1rem; margin-bottom:1rem; font-size: 0.95rem; font-weight:bold; align-items:center;">
+            <span style="background:var(--accent-color); color:white; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem;">장르별 보기</span>
+            <a href="community.html?category=영화" style="color:var(--text-color); text-decoration:none;">전체</a>
+            <a href="community.html?category=영화&genre=액션" style="color:var(--text-color); text-decoration:none;">액션</a>
+            <a href="community.html?category=영화&genre=로맨스" style="color:var(--text-color); text-decoration:none;">로맨스</a>
+            <a href="community.html?category=영화&genre=스릴러" style="color:var(--text-color); text-decoration:none;">스릴러</a>
+            <a href="community.html?category=영화&genre=코미디" style="color:var(--text-color); text-decoration:none;">코미디</a>
+            <a href="community.html?category=영화&genre=공포" style="color:var(--text-color); text-decoration:none;">공포</a>
+            <a href="community.html?category=영화&genre=SF" style="color:var(--text-color); text-decoration:none;">SF/판타지</a>
+        </nav>
+
+        <!-- HOT 게시물 -->
+        <section>
+            <h2 class="section-title">🔥 주간 베스트 게시글</h2>
+            <div class="hot-grid">
+                <div class="hot-card">
+                    <div class="hot-title">듄 파트2 아이맥스 명당 예매 꿀팁 공유합니다</div>
+                    <div class="hot-meta">
+                        <span>씨네필</span>
+                        <span>조회 4,201 · 댓글 84</span>
+                    </div>
+                </div>
+                <div class="hot-card">
+                    <div class="hot-title">파묘 해석본 (스포주의) - 감독의 의도 분석</div>
+                    <div class="hot-meta">
+                        <span>해석충</span>
+                        <span>조회 3,890 · 댓글 120</span>
+                    </div>
+                </div>
+                <div class="hot-card">
+                    <div class="hot-title">CGV 팝콘 맛있게 커스텀해서 먹는 방법!</div>
+                    <div class="hot-meta">
+                        <span>프로먹방러</span>
+                        <span>조회 2,150 · 댓글 55</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 메인 게시판 (카드 리스트) -->
+        <section>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+                <h2 id="board-title" class="section-title" style="margin:0;">전체 게시판</h2>
+                <button class="btn-write" onclick="MapsTo('write_post.html')" style="padding:0.6rem 1.5rem; font-size:1rem; border-radius:30px; margin-top:0;">✍️ 글쓰기</button>
+            </div>
+            
+            <div id="community-board-list">
+                <!-- JS 렌더링 -->
+            </div>
+
+            <div class="write-btn-container">
+                <button class="btn-write" onclick="MapsTo('write_post.html')">✍️ 글쓰기</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 다크모드
+        let isDarkMode = false;
+        const themeBtn = document.querySelector('#theme-toggle');
+        themeBtn.addEventListener('click', function() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            themeBtn.textContent = isDarkMode ? '라이트 모드' : '다크 모드';
+        });
+
+        // 사용자 표시
+        const currentUserStr = localStorage.getItem('currentUser');
+        if (currentUserStr) {
+            try {
+                const currentUser = JSON.parse(currentUserStr);
+                const greetingElement = document.getElementById('community-greeting');
+                const displayName = currentUser.name || (currentUser.email ? currentUser.email.split('@')[0] : '아이디');
+                greetingElement.innerText = displayName + "님";
+            } catch (e) {}
+        } else {
+            document.getElementById('community-greeting').innerText = "아이디님";
+        }
+
+        // 사이드 메뉴 동작
+        const hamburgerBtn = document.getElementById('hamburger-menu');
+        const closeMenuBtn = document.getElementById('close-menu');
+        const sideMenu = document.getElementById('side-menu');
+
+        hamburgerBtn.addEventListener('click', () => {
+            sideMenu.classList.add('open');
+        });
+
+        closeMenuBtn.addEventListener('click', () => {
+            sideMenu.classList.remove('open');
+        });
+    </script>
+</body>
+</html>

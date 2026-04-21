@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <script>
+        // 로그인 한 사용자면 main.html, 아니면 login.html로 라우팅
+        if (!localStorage.getItem('currentUser')) {
+            window.location.replace('login.html');
+        } else {
+            window.location.replace('main.html');
+        }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineYang - 영화 전문 플랫폼</title>
+    <link rel="icon" href="film.png" type="image/png">
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="script.js" defer></script>
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333333;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --header-border: #eeeeee;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+            --hover-bg: #f1f1f1;
+            --accent-color: #e50914;
+            --modal-bg: #ffffff;
+            --review-bg: #f8f8f8;
+            --input-bg: #ffffff;
+            --chat-bg: #f5f5f5;
+            --ranking-bg: #f9f9f9;
+            --input-border: #dddddd;
+            --placeholder: linear-gradient(135deg, #eee, #ddd);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #141414;
+            --text-color: #ffffff;
+            --header-bg: rgba(20, 20, 20, 0.85);
+            --header-border: #333333;
+            --card-bg: #222222;
+            --border-color: #333333;
+            --hover-bg: #2a2a2a;
+            --modal-bg: #222222;
+            --review-bg: #2a2a2a;
+            --input-bg: #2a2a2a;
+            --chat-bg: #3a3a3a;
+            --ranking-bg: #333333;
+            --input-border: #555555;
+            --placeholder: linear-gradient(135deg, #222, #111);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 기본 상태 */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #e50914;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* 폼 관련 통일 스타일 */
+        .header-input {
+            padding: 0.4rem;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 100px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .header-input:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+
+        .header-submit {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .header-submit:hover {
+            opacity: 0.8;
+        }
+
+        /* 상태 제어 및 네비게이션 버튼 */
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            color: #e50914;
+        }
+
+        /* 사이드 메뉴 */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 250px;
+            height: 100vh;
+            background-color: var(--modal-bg);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            z-index: 1000;
+            transition: right 0.3s ease, background-color 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        #close-menu {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: inherit;
+            padding: 0;
+            line-height: 1;
+            transition: opacity 0.3s;
+        }
+
+        #theme-toggle {
+            background-color: transparent;
+            color: inherit;
+            border: 2px solid currentColor;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        #theme-toggle:hover {
+            background-color: #e50914;
+            color: white !important;
+            border-color: #e50914;
+        }
+
+        /* 레이아웃 디자인 */
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .main-content {
+            flex: 3;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .main-sidebar {
+            flex: 1;
+            min-width: 320px;
+            position: sticky;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* 히어로 스타일 */
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            padding: 6rem 3rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero button {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* API 필터 및 카드 컨테이너 통용 */
+        .api-settings {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s;
+        }
+
+        .setting-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* 영화 공통 헤더 */
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #e50914;
+            padding-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-badge {
+            background-color: #e50914;
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .movie-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-card {
+            cursor: pointer;
+        }
+
+        .grid-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .poster-placeholder {
+            width: 100%;
+            height: 250px;
+            background: var(--placeholder);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .poster-placeholder .rank-number {
+            font-size: 5rem;
+            font-weight: 800;
+            color: rgba(229, 9, 20, 0.8);
+            font-style: italic;
+        }
+
+        .movie-info {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+        }
+
+        .movie-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 0 0 0.2rem 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* TMDB Poster Overlay */
+        .poster-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .poster-placeholder:hover .poster-overlay {
+            opacity: 1;
+        }
+
+        .overlay-overview {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+            text-overflow: ellipsis;
+        }
+
+        .overlay-genre,
+        .overlay-date {
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-bottom: 0.2rem;
+        }
+
+        .overlay-rating {
+            color: #f5b50a;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 리뷰 섹션 */
+        .review-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 1rem;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            resize: none;
+            font-family: inherit;
+            background-color: var(--review-bg);
+            color: inherit;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--ranking-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .chat-message {
+            background: var(--chat-bg);
+            padding: 0.8rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        /* 예매 블록 */
+        .cinema-flex {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cinema-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+        }
+
+        .cinema-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            filter: brightness(1.1);
+        }
+
+        .megabox {
+            background-color: #2F2156;
+        }
+
+        .cgv {
+            background-color: #FF2B2B;
+        }
+
+        .lotte {
+            background-color: #EE1C25;
+        }
+
+        /* 모달 스타일 (MY 창) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--modal-bg);
+            color: var(--text-color);
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        #close-my-page {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        /* 리뷰 액션 버튼 */
+        .btn-edit,
+        .btn-delete {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: inherit;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            background: #eee;
+            border-color: #aaa;
+            color: #333;
+        }
+
+        .btn-delete:hover {
+            background: #ffeeee;
+            border-color: #e50914;
+            color: #e50914;
+        }
+
+        /* 예고편 모달 */
+        .trailer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .trailer-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .trailer-content {
+            width: 90%;
+            max-width: 1100px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .close-trailer {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        /* 별점 인터랙션 */
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .star-rating span {
+            color: var(--input-border);
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .star-rating span:hover {
+            transform: scale(1.1);
+        }
+
+        .star-rating span.active {
+            color: #f5b50a;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header id="main-header">
+        <a href="#" class="logo" onclick="MapsTo('main.html')">
+            🎬 MYFLIX
+        </a>
+        <nav class="nav-links" style="display:flex; gap:2rem; margin-left:3rem; flex:1;">
+            <span class="nav-link active" onclick="MapsTo('main.html')"
+                style="cursor:pointer; font-weight:600; color:var(--accent-color);">홈</span>
+            <span class="nav-link" onclick="MapsTo('community.html')"
+                style="cursor:pointer; font-weight:600; color:var(--text-color);">커뮤니티</span>
+        </nav>
+        <div class="header-right">
+            <button class="icon-btn" onclick="openMyPage()"
+                style="margin-right: 10px; font-size:1.1rem; border:1px solid #ddd; padding: 0.4rem 1rem; border-radius: 20px;">
+                👤 MY
+            </button>
+            <form id="signup-form" onsubmit="return handleSignup(event)" class="header-form">
+                <input type="text" id="userId" name="userId" class="header-input" placeholder="아이디" required>
+                <input type="text" id="userName" name="userName" class="header-input" placeholder="이름" required>
+                <input type="email" id="userEmail" name="userEmail" class="header-input" placeholder="이메일" required>
+                <button type="submit" class="header-submit">가입</button>
+            </form>
+            <button id="hamburger-menu" class="icon-btn">☰</button>
+        </div>
+    </header>
+
+    <div id="side-menu" class="side-menu" style="overflow-y:auto;">
+        <button id="close-menu">×</button>
+        <h3 style="margin-top: 0; color: var(--accent-color);">커뮤니티 메뉴</h3>
+        <div
+            style="display:flex; flex-direction:column; gap:0.8rem; border-left: 2px solid var(--border-color); padding-left: 1rem; font-size:0.95rem; font-weight:bold;">
+            <a href="community.html" style="color:var(--text-color); text-decoration:none;">전체보기</a>
+            <a href="community.html?category=이글이글 🔥" style="color:#e50914; text-decoration:none;">이글이글 🔥</a>
+            <a href="community.html?category=커뮤니티" style="color:var(--text-color); text-decoration:none;">커뮤니티</a>
+            <a href="community.html?category=영화" style="color:var(--text-color); text-decoration:none;">영화</a>
+            <a href="community.html?category=OTT/콘텐츠" style="color:var(--text-color); text-decoration:none;">OTT/콘텐츠</a>
+            <a href="community.html?category=굿즈" style="color:var(--text-color); text-decoration:none;">굿즈</a>
+            <a href="community.html?category=자유/잡담" style="color:var(--text-color); text-decoration:none;">자유/잡담</a>
+            <a href="community.html?category=나눔/이벤트/정보"
+                style="color:var(--text-color); text-decoration:none;">나눔/이벤트/정보</a>
+            <a href="community.html?category=극장근처" style="color:var(--text-color); text-decoration:none;">극장근처</a>
+            <a href="community.html?category=달력" style="color:var(--text-color); text-decoration:none;">달력</a>
+            <a href="community.html?category=이벤트" style="color:var(--text-color); text-decoration:none;">이벤트</a>
+            <a href="community.html?category=교환/거래" style="color:var(--text-color); text-decoration:none;">교환/거래</a>
+            <a href="community.html?category=문의/건의" style="color:var(--text-color); text-decoration:none;">문의/건의</a>
+            <a href="community.html?category=공지" style="color:var(--text-color); text-decoration:none;">공지</a>
+        </div>
+        <h3 style="margin-top:1rem;">설정</h3>
+        <button id="theme-toggle">다크 모드</button>
+        <button id="about-menu-link" style="background-color: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">About</button>
+        <button onclick="logout()"
+                <!-- About 모달 -->
+                <div id="about-modal" class="modal-overlay">
+                    <div class="modal-content" style="max-width:500px;">
+                        <button onclick="closeAboutModal()" style="position:absolute; top:20px; right:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:inherit;">&times;</button>
+                        <h2 style="color:#e50914; margin-top:0;">About CineYang</h2>
+                        <p style="margin-top:1.5rem; font-size:1.1rem; color:#444;">
+                            <strong>CineYang</strong>은 영화 팬들을 위한 커뮤니티 플랫폼입니다.<br><br>
+                            TMDB, KOFIC API를 활용한 실시간 영화 정보, 박스오피스, 예고편, 리뷰, 채팅 등 다양한 기능을 제공합니다.<br><br>
+                            <span style="color:#e50914; font-weight:bold;">모든 영화 팬들이 자유롭게 소통하고 정보를 나눌 수 있는 공간</span>을 목표로 만들어졌습니다.<br><br>
+                            <span style="font-size:0.95rem; color:#888;">문의: cineyang@sample.com</span>
+                        </p>
+                    </div>
+                </div>
+            onmouseover="this.style.backgroundColor='#e50914'; this.style.color='white'; this.style.borderColor='#e50914'"
+            onmouseout="this.style.backgroundColor='transparent'; this.style.color='inherit'; this.style.borderColor='currentColor'"
+            style="background-color: transparent; color: inherit; border: 2px solid currentColor; padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">로그아웃</button>
+    </div>
+
+    <!-- [MY 페이지 모달] -->
+    <div id="my-page-modal" class="modal-overlay">
+        <div class="modal-content" id="modal-box">
+            <button id="close-my-page" onclick="closeMyPage()">&times;</button>
+            <h2
+                style="margin-top:0; color:#e50914; border-bottom: 2px solid #e50914; padding-bottom: 0.5rem; display:inline-block;">
+                🎬 MY 시네마 다이어리
+            </h2>
+            <p style="color:#888;">내가 작성한 모든 영화 리뷰를 확인, 수정, 삭제할 수 있습니다.</p>
+
+            <div id="modal-reviews-container" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:2rem;">
+                <!-- js 렌더링 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- [예고편 재생 모달] -->
+    <div id="trailer-modal" class="trailer-modal">
+        <div class="trailer-content">
+            <button class="close-trailer" onclick="closeTrailer()">&times;</button>
+            <iframe id="trailer-iframe" width="100%" height="100%" src="" frameborder="0"
+                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <main>
+        <!-- 좌측: 메인 창 -->
+        <div class="main-content">
+            <section class="hero" id="hero-section">
+                <h1 id="hero-title">올해 최고의 기대작</h1>
+                <p id="hero-overview">숨막히는 액션과 탄탄한 스토리 라인. 전 세계를 강타한 블록버스터를 지금 확인하세요.</p>
+                <button onclick="playHeroTrailer()" id="hero-play-btn">예고편 보기</button>
+            </section>
+
+            <!-- 영화 검색 시스템 -->
+            <div style="margin-top: 2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <h2 class="section-title">🔍 TMDB 무비 검색</h2>
+                </div>
+                <div class="movie-card" style="padding: 1.5rem; display:flex; gap:1rem;">
+                    <input type="text" id="search-input" class="header-input"
+                        style="flex:1; font-size:1rem; padding:0.8rem;" placeholder="영화 제목을 검색해보세요 (예: 인셉션)">
+                    <button class="header-submit" style="padding:0 2rem; font-size:1rem;"
+                        onclick="handleMovieSearch()">검색</button>
+                </div>
+                <div class="movie-grid" id="search-results" style="margin-top: 1.5rem; display:none;">
+                    <!-- 검색 결과 렌더링 -->
+                </div>
+            </div>
+
+            <!-- KOFIC API 실시간 연동 -->
+            <div>
+                <h2 class="section-title">
+                    대한민국 일별 박스오피스 <span class="live-badge">LIVE API</span>
+                </h2>
+
+                <div class="api-settings movie-card" id="settings-panel">
+                    <div class="setting-group">
+                        <div class="setting-item" style="display: none;">
+                            <label>🔑 KOFIC API Key</label>
+                            <input type="password" id="api-key-input" class="header-input" style="width: 250px;"
+                                placeholder="영화진흥위원회 발급 키 입력" value="894c40a2198d8730ae71c8fb24981808">
+                        </div>
+                        <div class="setting-item">
+                            <label>🌍 KOR/FOR</label>
+                            <select id="nation-select" class="header-input" style="width: 100px;">
+                                <option value="">전체 국적</option>
+                                <option value="K">한국영화</option>
+                                <option value="F">외국영화</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>🎥 상업/다양성</label>
+                            <select id="multi-select" class="header-input" style="width: 110px;">
+                                <option value="">전체 종류</option>
+                                <option value="Y">다양성 영화</option>
+                                <option value="N">상업 영화</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <button id="fetch-btn" class="header-submit" style="height: 38px; padding: 0 1.5rem;"
+                                onclick="loadCurrentlyPlaying()">조회하기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-grid" id="movie-container">
+                    <p>데이터를 불러오는 중입니다...</p>
+                </div>
+            </div>
+
+            <!-- 예매 -->
+            <div>
+                <h2 class="section-title">관람 극장 선택</h2>
+                <div class="cinema-flex">
+                    <a href="https://www.megabox.co.kr" target="_blank" class="cinema-box megabox">MEGABOX</a>
+                    <a href="https://cgv.co.kr" target="_blank" class="cinema-box cgv">CGV</a>
+                    <a href="https://www.lottecinema.co.kr/NLCHS?referrer=https://www.google.com/" target="_blank"
+                        class="cinema-box lotte">LOTTE CINEMA</a>
+                </div>
+            </div>
+
+            <!-- 관람 기록 입력부 분리 -->
+            <div>
+                <h2 class="section-title">✍️ 나의 관람 기록 남기기</h2>
+                <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+                    <form id="review-form" class="movie-card"
+                        style="padding: 1.5rem; flex: 1.5; min-width:300px; height:fit-content;">
+                        <div style="position: relative; width: 100%; margin-bottom: 0.5rem;">
+                            <input type="text" id="log-title" class="header-input"
+                                style="width: 100%; box-sizing:border-box; font-size: 1rem;" placeholder="영화 제목"
+                                autocomplete="off" required>
+                            <ul id="autocomplete-list"
+                                style="position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-top: none; list-style: none; padding: 0; margin: 0; z-index: 99; max-height: 150px; overflow-y: auto; display: none; box-shadow: var(--shadow); border-radius: 0 0 8px 8px;">
+                            </ul>
+                        </div>
+                        <div class="star-rating" id="star-rating"
+                            style="margin-bottom: 0.2rem; justify-content:center;">
+                            <span data-value="2" class="active">★</span>
+                            <span data-value="4" class="active">★</span>
+                            <span data-value="6" class="active">★</span>
+                            <span data-value="8" class="active">★</span>
+                            <span data-value="10" class="active">★</span>
+                        </div>
+                        <input type="hidden" id="log-rating" value="10" required>
+                        <div style="text-align:center; font-size:0.85rem; color:var(--accent-color); font-weight:bold; margin-bottom:1rem;"
+                            id="rating-display">10점 최상이에요!</div>
+                        <textarea id="log-review" class="review-textarea" placeholder="감상평을 적어주세요. 작성하면 메인 토크에도 게시됩니다!"
+                            required></textarea>
+
+                        <div style="display:flex; gap:1rem; margin-top:0.5rem;">
+                            <button type="submit" class="header-submit"
+                                style="flex:1; padding: 0.8rem; font-size: 1rem;">나만의 리뷰 남기기</button>
+                            <button type="button" onclick="openMyPage()" class="header-input"
+                                style="flex:1; background: #eee; cursor: pointer; color:#333; font-weight:bold; height: 100%; padding:0.8rem;">전체
+                                작성 목록 보기(MY)</button>
+                        </div>
+                    </form>
+
+                    <!-- 커뮤니티 랭킹 구역 -->
+                    <div class="movie-card" style="padding: 1.5rem; flex: 1; min-width: 250px;">
+                        <h3
+                            style="margin-top:0; color:#e50914; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; font-size: 1.1rem;">
+                            🌐 사용자 추천 역대 명작 TOP 3
+                        </h3>
+                        <ul
+                            style="list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                            <li class="ranking-item">
+                                <span style="font-weight:bold; font-size:1rem;">1위. 어바웃 타임</span>
+                                <span style="color:#f5b50a; font-weight:bold;">★ 9.8</span>
+                            </li>
+                            <li class="ranking-item">
+                                <span style="font-weight:bold; font-size:1rem;">2위. 인셉션</span>
+                                <span style="color:#f5b50a; font-weight:bold;">★ 9.7</span>
+                            </li>
+                            <li class="ranking-item">
+                                <span style="font-weight:bold; font-size:1rem;">3위. 라라랜드</span>
+                                <span style="color:#f5b50a; font-weight:bold;">★ 9.5</span>
+                            </li>
+                        </ul>
+
+                        <div
+                            style="margin-top: 2rem; background: rgba(229,9,20,0.1); padding: 1rem; border-radius: 8px; text-align: center;">
+                            <h4 style="margin:0 0 0.5rem 0; color:#e50914;">📈 나의 커뮤니티 활동 등급</h4>
+                            <p style="margin:0; font-size:1rem; font-weight:bold;" id="my-ranking-badge">
+                                리뷰를 작성하면 활동 배지가 부여됩니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 우측: 사이드바 (추천 영화 & 영화 토크) -->
+        <div class="main-sidebar">
+            <div class="movie-card" style="padding: 1.5rem;" id="recommendation-sidebar">
+                <h3 style="margin-top:0; color:#e50914; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">🌟 오늘의
+                    추천 영화</h3>
+                <p style="color:#888; font-size:0.9rem;">추천 영화를 로드하는 중입니다...</p>
+            </div>
+
+            <!-- 라이브 토크 창 -->
+            <div class="movie-card" style="padding: 1.5rem; height: 600px; display:flex; flex-direction:column;">
+                <h3 style="margin-top:0; color:#e50914; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">💬 라이브
+                    영화 토크 & 피드</h3>
+                <p style="font-size:0.8rem; color:#888; margin:0.5rem 0 0 0;">내가 작성한 리뷰나 다른 사람의 관람평이 이곳에 실시간으로 공유됩니다.
+                </p>
+
+                <div id="chat-box"
+                    style="flex:1; overflow-y:auto; margin-top:1rem; display:flex; flex-direction:column; gap:1rem;">
+                    <!-- 채팅 메시지 DOM -->
+                </div>
+
+                <form id="chat-form" style="display:flex; gap:0.5rem; margin-top:1rem;">
+                    <input type="text" id="chat-input" class="header-input"
+                        style="flex:1; width:100%; border:1px solid #ddd;" placeholder="자유롭게 기록 남기기" required>
+                    <button type="submit" class="header-submit" style="padding: 0.5rem 1rem;">전송</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+                // About 버튼 및 모달 제어
+                const aboutBtn = document.getElementById('about-menu-link');
+                const aboutModal = document.getElementById('about-modal');
+                if (aboutBtn && aboutModal) {
+                    aboutBtn.addEventListener('click', function() {
+                        aboutModal.style.display = 'flex';
+                        setTimeout(() => aboutModal.classList.add('show'), 10);
+                    });
+                }
+                function closeAboutModal() {
+                    aboutModal.classList.remove('show');
+                    setTimeout(() => aboutModal.style.display = 'none', 300);
+                }
+        let isDarkMode = false;
+
+        // ----------------------------------------------------
+        // TMDB API 공통 & 장르 맵 초기화
+        // ----------------------------------------------------
+        const tmdbApiKey = '805239c31ff085f3a556697ca05b757b';
+        let genreMap = {};
+
+        async function initTMDB() {
+            try {
+                const response = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${tmdbApiKey}&language=ko-KR`);
+                const data = await response.json();
+                if (data.genres) {
+                    data.genres.forEach(g => {
+                        genreMap[g.id] = g.name;
+                    });
+                }
+            } catch (e) {
+                console.error("장르 로드 실패", e);
+            }
+            loadDailyRecommendation();
+        }
+        initTMDB();
+
+        async function fetchMovieDataByName(movieName) {
+            try {
+                const url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbApiKey}&language=ko-KR&query=${encodeURIComponent(movieName)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    return data.results[0];
+                }
+            } catch (e) {
+                console.error('TMDB 검색 에러:', e);
+            }
+            return null;
+        }
+
+        // ----------------------------------------------------
+        // 영화 검색 기능 (TMDB API)
+        // ----------------------------------------------------
+        async function handleMovieSearch() {
+            const input = document.getElementById('search-input').value.trim();
+            if (!input) return alert("검색어를 입력해주세요.");
+
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.style.display = 'grid';
+            resultsContainer.innerHTML = '<p style="grid-column: 1/-1;">검색 중...</p>';
+
+            try {
+                const url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbApiKey}&language=ko-KR&query=${encodeURIComponent(input)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    renderSearchResults(data.results.slice(0, 8)); // 최대 8개 렌더링
+                } else {
+                    resultsContainer.innerHTML = '<p style="grid-column: 1/-1;">검색 결과가 없습니다.</p>';
+                }
+            } catch (e) {
+                resultsContainer.innerHTML = '<p style="grid-column: 1/-1;">에러 발생!</p>';
+            }
+        }
+
+        function renderSearchResults(movies) {
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            movies.forEach((movie) => {
+                const card = document.createElement('div');
+                card.className = 'movie-card grid-card';
+                if (isDarkMode) card.style.backgroundColor = '#2a2a2a';
+
+                const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+                const genresText = movie.genre_ids ? movie.genre_ids.map(id => genreMap[id]).filter(Boolean).join(', ') : '';
+                const title = movie.title || movie.name;
+
+                card.innerHTML = `
+                    <div class="poster-placeholder" style="background-image: url('${posterUrl}'); background-size: cover; background-position: center;">
+                        <div class="poster-overlay">
+                            <div class="overlay-rating">★ ${movie.vote_average ? movie.vote_average.toFixed(1) : '-'}</div>
+                            <div class="overlay-genre">${genresText}</div>
+                            <div class="overlay-date">${movie.release_date || ''}</div>
+                            <div class="overlay-overview">${movie.overview || '줄거리가 없습니다.'}</div>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${title}</h3>
+                        <div class="movie-rating" style="margin-top: 5px;">📝 개봉: ${movie.release_date || '-'}</div>
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // ----------------------------------------------------
+        // 오늘의 추천 영화 로드 기능 (TMDB Popular)
+        // ----------------------------------------------------
+        async function loadDailyRecommendation() {
+            const sidebar = document.getElementById('recommendation-sidebar');
+            try {
+                const url = `https://api.themoviedb.org/3/movie/popular?api_key=${tmdbApiKey}&language=ko-KR&page=1`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const topMovie = data.results[0]; // 가장 인기있는 영화
+                    const posterUrl = topMovie.backdrop_path ? `https://image.tmdb.org/t/p/w780${topMovie.backdrop_path}` : (topMovie.poster_path ? `https://image.tmdb.org/t/p/w500${topMovie.poster_path}` : '');
+
+                    sidebar.innerHTML = `
+                        <h3 style="margin-top:0; color:#e50914; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">🌟 오늘의 추천 영화</h3>
+                        <img src="${posterUrl}" alt="${topMovie.title}" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-top:1rem;">
+                        <h4 style="margin: 1rem 0 0.5rem 0; font-size: 1.2rem;">${topMovie.title}</h4>
+                        <div style="color: #f5b50a; font-weight:bold; margin-bottom: 0.5rem;">★ ${topMovie.vote_average.toFixed(1)} / 10</div>
+                        <p style="font-size:0.95rem; color:#888; margin:0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;">
+                            ${topMovie.overview || "전 세계적인 인기를 끌고 있는 화제작, 오늘 시청해보시는 걸 추천합니다!"}
+                        </p>
+                    `;
+                }
+            } catch (e) {
+                sidebar.innerHTML += '<p>추천 영화를 로드하지 못했습니다.</p>';
+            }
+        }
+
+        // ----------------------------------------------------
+        // KOFIC REST API 호출
+        // ----------------------------------------------------
+        const movieContainer = document.getElementById('movie-container');
+
+        async function loadCurrentlyPlaying() {
+            const apiKeyInput = document.getElementById('api-key-input').value.trim();
+            const repNationCd = document.getElementById('nation-select').value;
+            const multiMovieYn = document.getElementById('multi-select').value;
+
+            if (!apiKeyInput) return alert("API 키를 입력해주세요!");
+
+            movieContainer.innerHTML = '<p style="grid-column: 1/-1; padding: 2rem; background: #eee; border-radius: 8px;">KOFIC 박스오피스 데이터를 요청 중입니다... (CORS 및 응답 대기중)</p>';
+
+            const mockMovies = [
+                { rank: 1, rankInten: "0", rankOldAndNew: "OLD", movieNm: '파묘', audiCnt: 215032, audiAcc: 11250320, scrnCnt: 1400, openDt: '2024-02-22' },
+                { rank: 2, rankInten: "1", rankOldAndNew: "OLD", movieNm: '범죄도시4', audiCnt: 180450, audiAcc: 890450, scrnCnt: 1100, openDt: '2024-04-24' },
+                { rank: 3, rankInten: "-1", rankOldAndNew: "OLD", movieNm: '듄: 파트2', audiCnt: 120320, audiAcc: 540320, scrnCnt: 890, openDt: '2024-02-28' },
+                { rank: 4, rankInten: "0", rankOldAndNew: "NEW", movieNm: '시민덕희', audiCnt: 82000, audiAcc: 420950, scrnCnt: 600, openDt: '2024-01-24' }
+            ];
+
+            try {
+                const today = new Date();
+                today.setDate(today.getDate() - 1);
+                const targetDt = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+
+
+                let url = `http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=${apiKeyInput}&targetDt=${targetDt}&itemPerPage=8`;
+                if (repNationCd) url += `&repNationCd=${repNationCd}`;
+                if (multiMovieYn) url += `&multiMovieYn=${multiMovieYn}`;
+
+                // 프록시를 통해 요청
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const fetchUrl = proxyUrl + url;
+                const response = await fetch(fetchUrl);
+                if (!response.ok) throw new Error("Status: " + response.status);
+                const data = await response.json();
+
+                if (data.faultInfo) throw new Error(data.faultInfo.message);
+                if (data.boxOfficeResult && data.boxOfficeResult.dailyBoxOfficeList) {
+                    const rawMovies = data.boxOfficeResult.dailyBoxOfficeList;
+                    if (rawMovies.length === 0) return movieContainer.innerHTML = '<p style="grid-column: 1/-1;">조건에 일치하는 데이터가 없습니다.</p>';
+                    renderMovies(rawMovies);
+                } else throw new Error("응답 형식 오류!");
+            } catch (error) {
+                // error.message를 통해 실제 발생한 에러 내용을 가져옵니다.
+                movieContainer.innerHTML = `
+                    <div style="grid-column: 1 / -1; color:#e50914; font-weight:bold; background-color: rgba(229,9,20,0.1); padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e50914;">
+                        ⚠️ KOFIC API 통신 실패!<br>
+                        <span style="font-size: 0.9em; font-weight: normal; color: #fff;">
+                            에러 내용: ${error.message}
+                        </span>
+                    </div>`;
+                renderMovies(mockMovies, true);
+            }
+        }
+
+        function renderMovies(movies, isAppend = false) {
+            if (!isAppend) movieContainer.innerHTML = '';
+            movies.forEach((movie, index) => {
+                const card = document.createElement('div');
+                card.className = 'movie-card grid-card';
+                if (isDarkMode) card.style.backgroundColor = '#2a2a2a';
+
+                let rankChanges = movie.rankOldAndNew === 'NEW' ? '<span style="color:#e50914; font-size:0.8rem; vertical-align: top;">NEW</span>'
+                    : Number(movie.rankInten) > 0 ? `<span style="color:#e50914; font-size:0.8rem; vertical-align: top;">▲${movie.rankInten}</span>`
+                        : Number(movie.rankInten) < 0 ? `<span style="color:#0078ff; font-size:0.8rem; vertical-align: top;">▼${Math.abs(movie.rankInten)}</span>`
+                            : '<span style="color:#888; font-size:0.8rem; vertical-align: top;">-</span>';
+
+                const uniqueId = `poster-${movie.movieCd || movie.rank}-${index}`;
+
+                card.innerHTML = `
+                    <div class="poster-placeholder" id="${uniqueId}">
+                        <span class="rank-number">${movie.rank}</span>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.movieNm} ${rankChanges}</h3>
+                        <div class="movie-rating">🎫 당일 관객: ${Number(movie.audiCnt).toLocaleString()}명</div>
+                        <div class="movie-rating">👥 누적 관객: ${Number(movie.audiAcc).toLocaleString()}명</div>
+                        <div class="movie-rating" style="margin-top: 5px;">🎬 스크린 수: ${Number(movie.scrnCnt || 0).toLocaleString()}개</div>
+                    </div>
+                `;
+                movieContainer.appendChild(card);
+
+                // 카드 생성 후 브라우저가 화면을 그리는 동안 서버에서 상세정보를 찾아와 오버레이와 포스터 추가
+                fetchMovieDataByName(movie.movieNm).then(tmdbData => {
+                    if (tmdbData) {
+                        const placeholder = document.getElementById(uniqueId);
+                        if (placeholder) {
+                            const posterUrl = tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : '';
+                            const genresText = tmdbData.genre_ids ? tmdbData.genre_ids.map(id => genreMap[id]).filter(Boolean).join(', ') : '';
+
+                            let overlayHtml = `
+                                <div class="poster-overlay">
+                                    <div class="overlay-rating">★ ${tmdbData.vote_average ? tmdbData.vote_average.toFixed(1) : '-'}</div>
+                                    <div class="overlay-genre">${genresText}</div>
+                                    <div class="overlay-date">${tmdbData.release_date || ''}</div>
+                                    <div class="overlay-overview">${tmdbData.overview || '줄거리 정보가 제공되지 않습니다.'}</div>
+                                </div>
+                            `;
+
+                            if (posterUrl) {
+                                placeholder.innerHTML = `
+                                    <img src="${posterUrl}" alt="${movie.movieNm} 포스터" style="width:100%; height:100%; object-fit:cover; transition: opacity 0.5s;">
+                                    <div style="position:absolute; top:10px; left:10px; background:rgba(229,9,20,0.9); color:white; padding:5px 15px; border-radius:4px; font-weight:bold; font-size:1.1rem; box-shadow:0 2px 5px rgba(0,0,0,0.3);">${movie.rank}위</div>
+                                    ${overlayHtml}
+                                `;
+                            } else {
+                                placeholder.innerHTML += overlayHtml;
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        loadCurrentlyPlaying();
+
+        // ----------------------------------------------------
+        // 라이브 영화 토크 (채팅) 초기화
+        // ----------------------------------------------------
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatBox = document.getElementById('chat-box');
+
+        const liveChats = [
+            { user: '영화광', text: '범죄도시4 타격감 진짜 대박임 ㄷㄷ' },
+            { user: '시네필', text: '파묘 기괴한 분위기 미쳤음' },
+            { user: '운영자', text: '오늘의 추천작 인터스텔라! 무조건 큰 화면으로 보세요.' }
+        ];
+
+        function renderChats() {
+            chatBox.innerHTML = '';
+            liveChats.forEach(chat => {
+                const div = document.createElement('div');
+                div.className = 'chat-message';
+
+                div.innerHTML = `<strong style="color:#e50914;">${chat.user}</strong> 
+                                 <br><span style="font-size:0.95rem; line-height: 1.4; display:block; margin-top:4px;">${chat.text}</span>`;
+                chatBox.appendChild(div);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text) {
+                liveChats.push({ user: document.getElementById('userName').value || '익명 관람객', text });
+                chatInput.value = '';
+                renderChats();
+            }
+        });
+        renderChats();
+
+        // ----------------------------------------------------
+        // 나의 관람 기록 스토리지 연동 및 MY 피이지(Modal) 통합 로직
+        // ----------------------------------------------------
+        const reviewForm = document.getElementById('review-form');
+        const myRankingBadge = document.getElementById('my-ranking-badge');
+        const modalReviewsContainer = document.getElementById('modal-reviews-container');
+
+        // 리뷰 데이터 불러와서 MY 창에 렌더링하기
+        function loadMyPageReviews() {
+            const reviews = JSON.parse(localStorage.getItem('cineyang_reviews') || '[]');
+            modalReviewsContainer.innerHTML = '';
+
+            // 나의 커뮤니티 배지 연산
+            let rankPercent = 100;
+            if (reviews.length >= 10) rankPercent = 1;
+            else if (reviews.length >= 5) rankPercent = 5;
+            else if (reviews.length >= 3) rankPercent = 15;
+            else if (reviews.length >= 1) rankPercent = 45;
+            myRankingBadge.innerHTML = reviews.length === 0 ? '작성된 리뷰 없음' : `🔥 상위 <strong>${rankPercent}%</strong> 헤비 리뷰어 (총 ${reviews.length}편)`;
+
+            if (reviews.length === 0) {
+                modalReviewsContainer.innerHTML = `
+                    <div style="padding: 2rem; text-align:center; background:rgba(0,0,0,0.02); border-radius:12px;">
+                        <p style="color:#888; font-size:1.1rem;">아직 작성된 리뷰가 없습니다.<br>메인화면에서 첫 리뷰를 남겨주세요!</p>
+                    </div>`;
+                return;
+            }
+
+            reviews.forEach((review, index) => {
+                const item = document.createElement('div');
+                item.className = 'movie-card';
+                item.style.padding = '1.5rem';
+                item.style.border = '1px solid var(--border-color)';
+                item.style.boxShadow = 'none';
+
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h4 style="margin:0; font-size:1.2rem; color:#e50914;">🍿 ${review.title}</h4>
+                        <span style="color:#f5b50a; font-weight:bold; font-size:1.1rem;">★ ${review.rating}</span>
+                    </div>
+                    <p style="margin: 0 0 1rem 0; line-height: 1.6; padding: 1rem; border-left: 4px solid #f5b50a; background: rgba(0,0,0,0.03); border-radius: 4px; font-size: 1rem;">
+                        ${review.text}
+                    </p>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.85rem; color:#aaa;">작성일: ${review.date}</span>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button class="btn-edit" onclick="editReview(${index})">수정</button>
+                            <button class="btn-delete" onclick="deleteReview(${index})">삭제</button>
+                        </div>
+                    </div>
+                `;
+                modalReviewsContainer.appendChild(item);
+            });
+        }
+
+        // 리뷰 등록 메인 이벤트
+        reviewForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const title = document.getElementById('log-title').value;
+            const rating = document.getElementById('log-rating').value;
+            const text = document.getElementById('log-review').value;
+
+            const newReview = {
+                title, rating, text,
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
+            };
+
+            const reviews = JSON.parse(localStorage.getItem('cineyang_reviews') || '[]');
+            reviews.unshift(newReview); // 최신이 가장 위로 가게 저장
+            localStorage.setItem('cineyang_reviews', JSON.stringify(reviews));
+
+            // [핵심] 작성된 리뷰를 즉시 '영화 토크 (커뮤니티)'에 자동 게시
+            const myName = document.getElementById('userName').value || 'MY리뷰어';
+            liveChats.push({
+                user: myName,
+                text: `<strong style="color:#e50914">[리뷰 공유] ${title}</strong><br>별점 ★ ${rating}점을 남기셨습니다.<br>"${text}"`
+            });
+            renderChats(); // 토크창 리렌더링
+
+            alert('🎥 다이어리 기록 완료! 커뮤니티 타임라인에도 공유되었습니다.');
+            reviewForm.reset();
+            loadMyPageReviews();
+        });
+
+        // 리뷰 삭제 & 수정 핸들러
+        window.deleteReview = function (index) {
+            if (confirm('이 소중한 다이어리 기록을 완전히 삭제하시겠습니까?')) {
+                const reviews = JSON.parse(localStorage.getItem('cineyang_reviews') || '[]');
+                reviews.splice(index, 1);
+                localStorage.setItem('cineyang_reviews', JSON.stringify(reviews));
+                loadMyPageReviews();
+            }
+        };
+
+        window.editReview = function (index) {
+            const reviews = JSON.parse(localStorage.getItem('cineyang_reviews') || '[]');
+            const tr = reviews[index];
+            const newText = prompt(`'${tr.title}' 감상평 수정하기`, tr.text);
+            if (newText !== null && newText.trim() !== '') {
+                reviews[index].text = newText;
+                reviews[index].date = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString() + ' (수정됨)';
+                localStorage.setItem('cineyang_reviews', JSON.stringify(reviews));
+                loadMyPageReviews();
+            }
+        };
+
+        loadMyPageReviews();
+
+        // MY 모달 제어 함수
+        const myPageModal = document.getElementById('my-page-modal');
+        function openMyPage() {
+            myPageModal.style.display = 'flex';
+            setTimeout(() => myPageModal.classList.add('show'), 10);
+            loadMyPageReviews(); // 열때 리스트 리로드 (다크모드등 색상 동기화 위함)
+        }
+        function closeMyPage() {
+            myPageModal.classList.remove('show');
+            setTimeout(() => myPageModal.style.display = 'none', 300);
+        }
+
+        // ----------------------------------------------------
+        // 각종 UI 버튼 기능 및 다크모드 공통 매니저
+        // ----------------------------------------------------
+        function handleSignup(event) {
+            event.preventDefault();
+            const idInput = document.querySelector('#userId').value;
+            const nameInput = document.querySelector('#userName').value;
+            alert(`[가입 완료]\n환영합니다 ${nameInput}님!\n이제 좌측 상단 [MY] 버튼과 우측 영화 토크를 이용해보세요.`);
+            document.querySelector('#signup-form').reset();
+        }
+
+        const hamburgerBtn = document.querySelector('#hamburger-menu');
+        const closeMenuBtn = document.querySelector('#close-menu');
+        const sideMenu = document.querySelector('#side-menu');
+        hamburgerBtn.addEventListener('click', () => sideMenu.classList.add('open'));
+        closeMenuBtn.addEventListener('click', () => sideMenu.classList.remove('open'));
+
+
+        // 다크모드 (CSS 변수 활용)
+        const themeBtn = document.querySelector('#theme-toggle');
+        themeBtn.addEventListener('click', function () {
+            isDarkMode = !isDarkMode;
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            themeBtn.textContent = isDarkMode ? '라이트 모드' : '다크 모드';
+        });
+
+        // ----------------------------------------------------
+        // TMDB 기반 히어로 섹션 동적 로드 & 예고편 재생
+        // ----------------------------------------------------
+        let heroMovieId = null;
+        async function loadDynamicHero() {
+            try {
+                const url = `https://api.themoviedb.org/3/movie/popular?api_key=${tmdbApiKey}&language=ko-KR&page=1`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.results && data.results.length > 0) {
+                    const heroMovie = data.results[Math.floor(Math.random() * Math.min(5, data.results.length))]; // TOP 5 중 랜덤
+                    heroMovieId = heroMovie.id;
+                    const bdrop = `https://image.tmdb.org/t/p/original${heroMovie.backdrop_path}`;
+                    document.getElementById('hero-section').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('${bdrop}')`;
+                    document.getElementById('hero-title').innerText = heroMovie.title;
+                    document.getElementById('hero-overview').innerText = heroMovie.overview || '놀라운 영화적 경험이 여러분을 기다립니다.';
+                }
+            } catch (e) {
+                console.error('히어로 로드 실패:', e);
+            }
+        }
+
+        async function playHeroTrailer() {
+            if (!heroMovieId) return alert('예고편 정보가 없습니다.');
+            try {
+                const url = `https://api.themoviedb.org/3/movie/${heroMovieId}/videos?api_key=${tmdbApiKey}&language=ko-KR`;
+                const res = await fetch(url);
+                let data = await res.json();
+
+                if (!data.results || data.results.length === 0) {
+                    const enUrl = `https://api.themoviedb.org/3/movie/${heroMovieId}/videos?api_key=${tmdbApiKey}&language=en-US`;
+                    const enRes = await fetch(enUrl);
+                    data = await enRes.json();
+                }
+
+                if (data.results && data.results.length > 0) {
+                    const trailer = data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube') || data.results[0];
+                    document.getElementById('trailer-iframe').src = `https://www.youtube.com/embed/${trailer.key}?autoplay=1`;
+                    document.getElementById('trailer-modal').style.display = 'flex';
+                    setTimeout(() => document.getElementById('trailer-modal').classList.add('show'), 10);
+                } else {
+                    alert('등록된 예고편 영상이 없습니다.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('예고편 정보를 불러오는 중 에러가 발생했습니다.');
+            }
+        }
+
+        window.closeTrailer = function () {
+            document.getElementById('trailer-modal').classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('trailer-modal').style.display = 'none';
+                document.getElementById('trailer-iframe').src = '';
+            }, 300);
+        }
+
+        // 별점 UI 인터랙션 
+        const stars = document.querySelectorAll('#star-rating span');
+
+        // 관람 기록 제목 자동완성 시스템
+        const logTitleInput = document.getElementById('log-title');
+        const autocompleteList = document.getElementById('autocomplete-list');
+        let autocompleteTimeout = null;
+
+        if (logTitleInput && autocompleteList) {
+            logTitleInput.addEventListener('input', function () {
+                clearTimeout(autocompleteTimeout);
+                const query = this.value.trim();
+                if (!query) {
+                    autocompleteList.style.display = 'none';
+                    return;
+                }
+
+                autocompleteTimeout = setTimeout(async () => {
+                    try {
+                        const url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbApiKey}&language=ko-KR&query=${encodeURIComponent(query)}`;
+                        const response = await fetch(url);
+                        const data = await response.json();
+
+                        if (data.results && data.results.length > 0) {
+                            autocompleteList.innerHTML = '';
+                            data.results.slice(0, 5).forEach(movie => {
+                                const li = document.createElement('li');
+                                li.style.padding = '10px 15px';
+                                li.style.cursor = 'pointer';
+                                li.style.borderBottom = '1px solid var(--border-color)';
+                                li.style.transition = 'background-color 0.2s';
+                                li.onmouseover = () => li.style.backgroundColor = 'var(--hover-bg)';
+                                li.onmouseout = () => li.style.backgroundColor = 'transparent';
+
+                                const releaseYear = movie.release_date ? movie.release_date.split('-')[0] : '';
+                                li.innerHTML = `<span style="font-weight:bold;">${movie.title}</span> <span style="font-size:0.8rem; color:#888;">${releaseYear}</span>`;
+
+                                li.addEventListener('click', () => {
+                                    logTitleInput.value = movie.title;
+                                    autocompleteList.style.display = 'none';
+                                });
+                                autocompleteList.appendChild(li);
+                            });
+                            autocompleteList.style.display = 'block';
+                        } else {
+                            autocompleteList.style.display = 'none';
+                        }
+                    } catch (e) {
+                        console.error("오토컴플리트 에러:", e);
+                    }
+                }, 300);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (e.target !== logTitleInput && e.target !== autocompleteList) {
+                    autocompleteList.style.display = 'none';
+                }
+            });
+        }
+        const ratingInput = document.getElementById('log-rating');
+        const ratingDisplay = document.getElementById('rating-display');
+        const ratingTexts = {
+            2: "2점 (별로예요)",
+            4: "4점 (그저 그래요)",
+            6: "6점 (볼만해요)",
+            8: "8점 (탁월해요)",
+            10: "10점 (최고예요!)"
+        };
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const val = parseInt(star.getAttribute('data-value'));
+                ratingInput.value = val;
+                ratingDisplay.innerText = ratingTexts[val] || val + "점";
+                stars.forEach(s => {
+                    if (parseInt(s.getAttribute('data-value')) <= val) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        loadDynamicHero();
+
+    </script>
+</body>
+
+</html>

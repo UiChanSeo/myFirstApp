@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYFLIX - 글 읽기</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="script.js" defer></script>
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333333;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --header-border: #eeeeee;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+            --hover-bg: #f1f1f1;
+            --accent-color: #e50914;
+            --modal-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-hover: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #141414;
+            --text-color: #ffffff;
+            --header-bg: rgba(20, 20, 20, 0.85);
+            --header-border: #333333;
+            --card-bg: #222222;
+            --border-color: #333333;
+            --hover-bg: #2a2a2a;
+            --modal-bg: #222222;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-hover: 0 12px 20px rgba(0,0,0,0.4);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: #e50914; text-decoration: none; cursor: pointer; }
+        
+        main {
+            max-width: 900px;
+            margin: 3rem auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+        }
+
+        .post-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .post-category {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .post-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 1rem 0;
+        }
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .post-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            min-height: 300px;
+            white-space: pre-wrap;
+        }
+        
+        .btn-back {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 3rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background: var(--hover-bg);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center; width: 100%;">
+            <a href="#" class="logo" onclick="MapsTo('community.html')">🎬 MYFLIX</a>
+            <span style="font-weight: bold; margin-left: 2rem; color: #888; font-size: 1.1rem;">| 커뮤니티</span>
+        </div>
+    </header>
+
+    <main id="post-container">
+        <!-- JS 렌더링 -->
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const postId = parseInt(params.get('id'));
+            
+            const posts = getCommunityPosts();
+            const post = posts.find(p => p.id === postId);
+            
+            if (!post) {
+                document.getElementById('post-container').innerHTML = `
+                    <div style="text-align:center; padding: 3rem;">
+                        <h2>존재하지 않거나 삭제된 게시물입니다.</h2>
+                        <button class="btn-back" onclick="MapsTo('community.html')">목록으로</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            document.getElementById('post-container').innerHTML = `
+                <div class="post-header">
+                    <span class="post-category">${post.category}</span>
+                    <h1 class="post-title">${post.title}</h1>
+                    <div class="post-meta">
+                        <div>
+                            <span style="font-weight:bold; color:var(--text-color); margin-right:1rem;">🧑‍💻 ${post.author}</span>
+                            <span>🕒 ${post.date}</span>
+                        </div>
+                        <div>
+                            <span style="margin-right:1rem;">👁️ 조회수 ${post.views || 0}</span>
+                            <span>💬 댓글 ${post.comments || 0}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">${post.content || '본문 내용이 없습니다.'}</div>
+                
+                <div style="text-align: center;">
+                    <button class="btn-back" onclick="MapsTo('community.html')">목록으로 돌아가기</button>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

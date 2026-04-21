@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYFLIX - 커뮤니티 글쓰기</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="script.js" defer></script>
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333333;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --header-border: #eeeeee;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+            --hover-bg: #f1f1f1;
+            --accent-color: #e50914;
+            --modal-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-hover: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #141414;
+            --text-color: #ffffff;
+            --header-bg: rgba(20, 20, 20, 0.85);
+            --header-border: #333333;
+            --card-bg: #222222;
+            --border-color: #333333;
+            --hover-bg: #2a2a2a;
+            --modal-bg: #222222;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-hover: 0 12px 20px rgba(0,0,0,0.4);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: #e50914; text-decoration: none; }
+        
+        main {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin: 2rem 0 1.5rem 0;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 0.8rem;
+            font-weight: bold;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
+        .input-text, .input-select, .input-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+        [data-theme="dark"] .input-text, [data-theme="dark"] .input-select, [data-theme="dark"] .input-textarea {
+            background: rgba(255,255,255,0.05);
+        }
+        .input-text:focus, .input-select:focus, .input-textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        .input-textarea {
+            height: 300px;
+            resize: vertical;
+        }
+        
+        .btn-submit {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+        .btn-submit:hover {
+            background-color: #c40812;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(229, 9, 20, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center; width: 100%;">
+            <a href="#" class="logo" onclick="MapsTo('community.html')">🎬 MYFLIX</a>
+            <span style="font-weight: bold; margin-left: 2rem; color: #888; font-size: 1.1rem;">| 커뮤니티 글쓰기</span>
+        </div>
+    </header>
+
+    <main>
+        <h2 class="section-title">새 게시글 작성</h2>
+        <form onsubmit="handleWritePost(event)">
+            <div class="form-group">
+                <label>카테고리</label>
+                <select id="post-category" class="input-select" onchange="toggleGenre()" required>
+                    <option value="이글이글 🔥">이글이글 🔥</option>
+                    <option value="커뮤니티">커뮤니티</option>
+                    <option value="영화">영화</option>
+                    <option value="OTT/콘텐츠">OTT/콘텐츠</option>
+                    <option value="굿즈">굿즈</option>
+                    <option value="자유/잡담">자유/잡담</option>
+                    <option value="나눔/이벤트/정보">나눔/이벤트/정보</option>
+                    <option value="극장근처">극장근처</option>
+                    <option value="달력">달력</option>
+                    <option value="이벤트">이벤트</option>
+                    <option value="교환/거래">교환/거래</option>
+                    <option value="문의/건의">문의/건의</option>
+                    <option value="공지">공지</option>
+                </select>
+            </div>
+            <div class="form-group" id="genre-group" style="display:none;">
+                <label>세부 장르 <span style="font-size:0.8rem; color:#888;">(영화 카테고리 전용)</span></label>
+                <select id="post-genre" class="input-select">
+                    <option value="액션">액션</option>
+                    <option value="로맨스">로맨스</option>
+                    <option value="스릴러">스릴러</option>
+                    <option value="코미디">코미디</option>
+                    <option value="공포">공포</option>
+                    <option value="SF">SF/판타지</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>제목</label>
+                <input type="text" id="post-title" class="input-text" placeholder="제목을 입력하세요." required>
+            </div>
+            <div class="form-group">
+                <label>본문 내용</label>
+                <textarea id="post-content" class="input-textarea" placeholder="타인을 비방하거나 불쾌감을 주는 게시글은 삭제될 수 있습니다." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">등록하기</button>
+        </form>
+    </main>
+
+    <script>
+        function toggleGenre() {
+            const categoryStr = document.getElementById('post-category').value;
+            const genreGroup = document.getElementById('genre-group');
+            if (categoryStr === '영화') {
+                genreGroup.style.display = 'block';
+            } else {
+                genreGroup.style.display = 'none';
+            }
+        }
+        
+        // 페이지 로드 시 파라미터가 있다면 자동 선택
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const initialCategory = params.get('category');
+            if (initialCategory) {
+                const selectElement = document.getElementById('post-category');
+                for (let i = 0; i < selectElement.options.length; i++) {
+                    if (selectElement.options[i].value === initialCategory) {
+                        selectElement.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            toggleGenre();
+        });
+    </script>
+</body>
+</html>
