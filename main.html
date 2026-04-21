@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineYang - 영화 전문 플랫폼</title>
+    <link rel="icon" href="film.png" type="image/png">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <script src="script.js" defer></script>
     <style>
@@ -589,6 +590,7 @@
         </div>
         <h3 style="margin-top:1rem;">설정</h3>
         <button id="theme-toggle">다크 모드</button>
+        <button id="about-menu-link" onclick="showAboutModal()" style="background-color: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">About</button>
         <button onclick="logout()" onmouseover="this.style.backgroundColor='#e50914'; this.style.color='white'; this.style.borderColor='#e50914'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='inherit'; this.style.borderColor='currentColor'" style="background-color: transparent; color: inherit; border: 2px solid currentColor; padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">로그아웃</button>
     </div>
 

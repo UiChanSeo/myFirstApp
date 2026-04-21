@@ -108,6 +108,16 @@ function logout() {
     window.location.replace("index.html");
 }
 
+function showAboutModal() {
+    const modal = document.getElementById('about-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.querySelector('.close-btn').onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
+}
+
 // ==========================================
 // ==========================================
 // 영화 커뮤니티 Mock Data 및 렌더링 로직

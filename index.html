@@ -719,24 +719,8 @@
         </div>
         <h3 style="margin-top:1rem;">설정</h3>
         <button id="theme-toggle">다크 모드</button>
-        <button id="about-menu-link" style="background-color: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">About</button>
-        <button onclick="logout()"
-                <!-- About 모달 -->
-                <div id="about-modal" class="modal-overlay">
-                    <div class="modal-content" style="max-width:500px;">
-                        <button onclick="closeAboutModal()" style="position:absolute; top:20px; right:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:inherit;">&times;</button>
-                        <h2 style="color:#e50914; margin-top:0;">About CineYang</h2>
-                        <p style="margin-top:1.5rem; font-size:1.1rem; color:#444;">
-                            <strong>CineYang</strong>은 영화 팬들을 위한 커뮤니티 플랫폼입니다.<br><br>
-                            TMDB, KOFIC API를 활용한 실시간 영화 정보, 박스오피스, 예고편, 리뷰, 채팅 등 다양한 기능을 제공합니다.<br><br>
-                            <span style="color:#e50914; font-weight:bold;">모든 영화 팬들이 자유롭게 소통하고 정보를 나눌 수 있는 공간</span>을 목표로 만들어졌습니다.<br><br>
-                            <span style="font-size:0.95rem; color:#888;">문의: cineyang@sample.com</span>
-                        </p>
-                    </div>
-                </div>
-            onmouseover="this.style.backgroundColor='#e50914'; this.style.color='white'; this.style.borderColor='#e50914'"
-            onmouseout="this.style.backgroundColor='transparent'; this.style.color='inherit'; this.style.borderColor='currentColor'"
-            style="background-color: transparent; color: inherit; border: 2px solid currentColor; padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">로그아웃</button>
+        <button id="about-menu-link" onclick="showAboutModal()" style="background-color: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; margin-top: 5px;">About</button>
+        <button onclick="logout()">로그아웃</button>
     </div>
 
     <!-- [MY 페이지 모달] -->
@@ -1107,14 +1091,11 @@
                 const targetDt = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
 
-                let url = `http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=${apiKeyInput}&targetDt=${targetDt}&itemPerPage=8`;
+                let url = `https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=${apiKeyInput}&targetDt=${targetDt}&itemPerPage=8`;
                 if (repNationCd) url += `&repNationCd=${repNationCd}`;
                 if (multiMovieYn) url += `&multiMovieYn=${multiMovieYn}`;
 
-                // 프록시를 통해 요청
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const fetchUrl = proxyUrl + url;
-                const response = await fetch(fetchUrl);
+                const response = await fetch(url);
                 if (!response.ok) throw new Error("Status: " + response.status);
                 const data = await response.json();
 
